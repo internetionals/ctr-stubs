@@ -1,0 +1,6 @@
+#!/bin/sh
+[ "${DEBUG_RUN:-0}" -eq 0 ] || set -x
+CMD="${0##*/}"
+IMGDIR="$(cd "$(dirname -- "$0")/.."; pwd -L)"
+IMG="${IMGDIR##*/}"
+"$IMGDIR/../do" "$IMG" "$CMD" "$@"

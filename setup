@@ -1,0 +1,10 @@
+#!/bin/sh
+
+BASEDIR="$(cd "$(dirname -- "$0")"; pwd -L)"
+for BINDIR in "$BASEDIR"/*/bin; do
+	if ! echo "$PATH" | grep -qE "(^|:)$BINDIR(:|$)"; then
+		PATH="$PATH:$BINDIR"
+	fi
+done
+export PATH
+unset BASEDIR
