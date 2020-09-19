@@ -11,18 +11,27 @@ ARG HOME
 ARG GECOS
 RUN set -eux; \
 	. /etc/os-release; \
-	if [ "$ID" = alpine ]; then \
-		addgroup -g "${GID}" "${GROUP}" || true; \
-		GROUP="$(getent group "${GID}" | cut -f1 -d:)"; \
-		adduser -h "${HOME}" -G "${GROUP}" -u "${UID}" -g "${GECOS}" -D "${USER}"; \
-	elif [ "$ID" = debian ]; then \
-		addgroup --gid "${GID}" "${GROUP}" || true; \
-		GROUP="$(getent group "${GID}" | cut -f1 -d:)"; \
-		adduser -q --home "${HOME}" --gid "${GID}" --uid "${UID}" --gecos "${GECOS}" --disabled-password "${USER}"; \
-	else \
-		echo "No adduser support"; \
-		exit 1; \
-	fi;
+	case "$ID" in \
+		alpine) \
+			addgroup -g "${GID}" "${GROUP}" || true; \
+			GROUP="$(getent group "${GID}" | cut -f1 -d:)"; \
+			adduser -h "${HOME}" -G "${GROUP}" -u "${UID}" -g "${GECOS}" -D "${USER}"; \
+			;; \
+		debian|ubuntu) \
+			addgroup --gid "${GID}" "${GROUP}" || true; \
+			GROUP="$(getent group "${GID}" | cut -f1 -d:)"; \
+			adduser -q --home "${HOME}" --gid "${GID}" --uid "${UID}" --gecos "${GECOS}" --disabled-password "${USER}"; \
+			;; \
+		fedora|rhel|centos) \
+			addgroup --gid "${GID}" "${GROUP}" || true; \
+			GROUP="$(getent group "${GID}" | cut -f1 -d:)"; \
+			adduser --non-unique --no-create-home --home-dir "${HOME}" --gid "${GID}" --uid "${UID}" --comment "${GECOS}" --password '!' "${USER}"; \
+			;; \
+		*) \
+			echo "No adduser support"; \
+			exit 1; \
+			;; \
+	esac;
 
 ENTRYPOINT []
 USER "${USER}"
