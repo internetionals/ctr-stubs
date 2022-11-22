@@ -56,7 +56,7 @@ if [ "${FORCE_REBUILD:-0}" -ne 0 ] || ! image_exists "$USER-do-$IMG"; then
 fi
 
 VOLS="${VOLS:-${EXTRA_VOLS:-} $PWD}"
-VOLS="$(echo "$VOLS" | sort -ur)"
+VOLS="$(echo "$VOLS" | sort -u)"
 DOCKER_ARGS="${DOCKER_ARGS:-}"
 for VOL in $VOLS; do
 	if [ -e "$VOL" ]; then
