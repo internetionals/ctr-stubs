@@ -3,4 +3,5 @@
 CMD="${0##*/}"
 IMGDIR="$(cd "$(dirname -- "$0")/.."; pwd -L)"
 IMG="${IMGDIR##*/}"
+[ -f "$IMGDIR/bin/common" ] && . "$IMGDIR/bin/common"
 "$IMGDIR/../do" "$IMG" "$CMD" "$@"

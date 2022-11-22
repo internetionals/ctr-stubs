@@ -55,4 +55,13 @@ if [ "${FORCE_REBUILD:-0}" -ne 0 ] || ! image_exists "$USER-do-$IMG"; then
 	BUILD_ARGS="" BASE_IMAGE="do-$IMG:latest" image_build "$USER-do-$IMG" "$BASEDIR"
 fi
 
-docker run -ti --rm -v "$HOME:$HOME" -v "$PWD:$PWD" -u "$UID:$GID" -w "$PWD" "$USER-do-$IMG" "$@"
+VOLS="${VOLS:-${EXTRA_VOLS:-} $PWD}"
+VOLS="$(echo "$VOLS" | sort -ur)"
+DOCKER_ARGS="${DOCKER_ARGS:-}"
+for VOL in $VOLS; do
+	if [ -e "$VOL" ]; then
+		DOCKER_ARGS="$DOCKER_ARGS --volume=$VOL:$VOL"
+	fi
+done
+
+docker run -ti --rm $DOCKER_ARGS -u "$UID:$GID" -w "$PWD" "$USER-do-$IMG" "$@"
